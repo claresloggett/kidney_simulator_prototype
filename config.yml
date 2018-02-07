@@ -1,0 +1,41 @@
+
+# Top-level config file
+# Most users will not need to modify this
+
+# Entity types that can be listed in event or state lists
+types:
+  patient:
+    AgeAtListing: int
+    X: int
+  kidney:
+    Y: int
+#  - patient_status_change
+
+# Variables that don't belong to entities/lists, but must be maintained
+# Have some initial value
+# Do these need to be able to be structures? To be read from file?
+state_variables:
+  source_balance:
+    type: int
+    initial_value: 0
+
+# Should this be distinguished from state variables?
+# Lists are parsed from a file. Are variables also?
+state_lists:
+  waitlist:
+    type: patient
+    default_path: waitlist.txt
+    parser: parse_patient_lists.py
+
+# Default event lists and their types
+event_lists:
+  patient_arrival:
+    type: patient
+    default_path: patients.txt
+    parser: parse_patient_lists.py
+    event_handler: handle_patient_arrival.py
+  kidney_arrival:
+    type: kidney
+    default_path: organs.txt
+    parser: parse_organ_lists.py
+    event_handler: handle_kidney_arrival.py

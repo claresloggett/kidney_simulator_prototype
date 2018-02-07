@@ -1,0 +1,4 @@
+ID,ArrivalDate,X,AgeAtArrival
+10,5-Feb-2018,30,20
+11,10-Feb-2018,40,50
+12,25-Feb-2018,30,22
