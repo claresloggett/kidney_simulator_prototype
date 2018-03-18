@@ -1,22 +1,9 @@
 
 # This is the core event loop
 # It does not handle any events, but farms them out to event handlers
-# It does not have a concept of a "kidney": a kidney arrival is a type of event
-# It *does* have a concept of a "patient", a "waiting list" of patients, and an "event list"
+# It does not have a concept of a "kidney" or "patient": these are defined in config.yml
+# It *does* have a concept of state variables, state lists (e.g. waitlist), and event lists
 # It *does* have a concept of dates and an effective fixed time granularity of one day
-# NB could the waiting list be generalised to be just another state variable?
-
-# TODO:
-# Read in patient variable spec
-
-# Read in event spec
-# (does kpsam allow to specify donor variables? i.e. event variables?)
-# Read in event lists (e.g. organ arrivals, patient status changes)
-# Read in patient arrivals
-# Read in state variable spec
-# Read in allocation rules (incl weeders, flags)
-# Read in any needed models to apply allocation process: conversion...
-# Read in any needed models for graft outcome process
 
 import argparse
 import yaml
@@ -32,18 +19,18 @@ parser.add_argument('run_spec', metavar='run-spec', help='run specification file
 parser.add_argument('--master-config', default="config.yml",
                     help='top-level config file')
 args = parser.parse_args()
-print("Arguments",args)
+#print("Arguments",args)
 
 # Read master config
 with open(args.master_config) as f:
     config = yaml.load(f)
-print(json.dumps(config, indent=2))
+#print(json.dumps(config, indent=2))
 
 # Get modular functions
+# Note that event lists have parsers and handlers; state lists only parsers
 event_parser = dict()
 event_handler = dict()
 state_parser = dict()
-state_handler = dict()
 for listname in config['event_lists'].keys():
     print("Loading parser for event list {} from {}".format(listname, config['event_lists'][listname]['parser']))
     module = load_module('parsers.events.'+listname, config['event_lists'][listname]['parser'])
@@ -65,11 +52,17 @@ def setup():
         run_spec = yaml.load(f)
     input_files = {'event_lists': {},
                    'state_lists': {}}
+    # Use run_spec file paths if provided, otherwise default paths from config.yml
     for listname in config['event_lists']:
-        input_files['event_lists'][listname] = config['event_lists'][listname]['default_path']
+        if listname in run_spec:
+            input_files['event_lists'][listname] = run_spec[listname]
+        else:
+            input_files['event_lists'][listname] = config['event_lists'][listname]['default_path']
     for listname in config['state_lists']:
-        input_files['state_lists'][listname] = config['state_lists'][listname]['default_path']
-    # TODO: Overwrite default input file paths with any run spec values
+        if listname in run_spec:
+            input_files['state_lists'][listname] = run_spec[listname]
+        else:
+            input_files['state_lists'][listname] = config['state_lists'][listname]['default_path']
     state_lists = {}
     state_variables = {}
     event_lists = {}

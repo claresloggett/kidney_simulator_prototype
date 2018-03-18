@@ -1,0 +1,7 @@
+
+run_name: testrun
+start_date: 2018/2/1
+end_date: 2018/3/1
+waitlist: example/waitlist.txt
+patient_arrival: example/patients.txt
+kidney_arrival: example/organs.txt
