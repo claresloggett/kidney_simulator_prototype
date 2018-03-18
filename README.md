@@ -1,24 +1,21 @@
 
 Proof-of-concept for modular, extensible simulator for kidney allocation process.
 
-The trivial simulator:
-- initial waitlist, patient arrival list, patient event list, organ arrival list
-- patients have only two variables, X and DOB
-- organs have only one variable, Y
-- patient status updates can change X
-- patients die only of old age - these are incoming status events
-- organs are always accepted
-- grafts last a finite uniform amount of time
-- all graft failures lead to relisting immediately after
+This is an architecture prototype - only trivial event handlers have been written, not realistic ones, and some kinds of events are not yet defined. It has not yet been optimised for speed. A realistic simulator will need more complex event handlers and parsers to be useful.
 
-Trivial and slightly less trivial experiments with allocation rules:
-- organ is allocated to the earliest patient on the waitlist
-- OR organ is allocated to the patient in the first 5 that has the X closest to Y
-- OR organ is allocated to a patient who's been waiting longer than T, then to matching X
+Run with
 
-To experiment with state variables:
-- organs get another variable, source, with two possible values
-- the number of organs from each source allocated to patients above age A must be balanced
+`python simulator.py example/run_spec.yml`
 
-To experiment with weeder rules and cutpoints:
-- patients are ineligible for low-Y organs if they are high-X or high age
+
+The motivating architecture here is that it is easy to define new types of events, entities, variables, and event handlers.
+
+The core simulator, `simulator.py`, is as generic as possible. It does not have any concept of a kidney or a patient, or of various kinds of events. These are all defined in `config.yml`, along with event handlers.
+
+Concepts which are hard-coded into the core simulator are:
+- dates: events occur in chronological order
+- event lists, as lists of events to be processed (the core event loop does not care what the events are)
+- state lists, as lists of entities to be maintained as part of the current state (the core event loop does not care what the entities are). The waitlist is an example.
+- state variables, as other variables to be maintained as part of the current state
+
+Event handlers are responsible for updating state lists and state variables, and possibly also updating event lists, in response to events.

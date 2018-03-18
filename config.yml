@@ -9,18 +9,23 @@ types:
     X: int
   kidney:
     Y: int
-#  - patient_status_change
+  patient_status_change:
+    X: int
+  patient_death: {}
 
 # Variables that don't belong to entities/lists, but must be maintained
-# Have some initial value
-# Do these need to be able to be structures? To be read from file?
+# These have some initial value, specified here
+# TODO: this approach doesn't allow structured variables, or initialisation from file
 state_variables:
   source_balance:
     type: int
     initial_value: 0
 
-# Should this be distinguished from state variables?
-# Lists are parsed from a file. Are variables also?
+# Lists which form part of the simulator state, and must be initialised & maintained
+# TODO: should state lists just be considered a special case of state variables?
+#   Lists are parsed from a file (though perhaps variable values should be also).
+#   Lists also have a listed entity type for validation (e.g. waitlist is a list of patients),
+#   which ordinary variables do not.
 state_lists:
   waitlist:
     type: patient
